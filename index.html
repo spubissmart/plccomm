@@ -3,12 +3,38 @@
 <head>
     <title>PLC Read App</title>
     <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.0.3.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/lodash/4.17.4/lodash.min.js"></script>
 </head>
 <body>
     <script>
-        $.get('/api/plcread?address=ZR0&len=10&station=1', function (data) {
-            alert(data[1]);
-        });
+        // open the chrome console, and paste in the two commented out lines below.
+        // var testData = [123,456,678,901,234,567,890,123,456,678,901,234,567,890,123,456,678,901,234,567,890,123,456,678,901,234,567,890]
+        // updateTable(testData)
+        var generateTd = (int) => { return `<td>${int}</td>` }
+        var generateTds = (ints) => {
+            return _.map(ints, generateTd).join('')
+        }
+        var generateTr = (ints) => {
+            return `
+                    <tr>
+                        ${generateTds(ints)}
+                    </tr>`
+        }
+        var generateTableBody = function(data) {
+            var tableRowLength = 5
+            var chunks = _.chunk(data, tableRowLength)
+            var trs = _.map(chunks, generateTr)
+            return trs.join('')
+        }
+        var updateTable = (data) => {
+            $('#tableBody').html(generateTableBody(data))
+        }
+        // the get request fails and I don't know what value is returned by the server, but it should work if it's an array of integers
+        $.get('/api/plcread', {address: 'ZR0', len: 10, station: 1})
+            .done((data) => {
+                var intsArray = JSON.parse(data)
+                updateTable(intsArray);
+            })
     </script>
 
     <table>
@@ -18,7 +44,7 @@
                 <!--More column headings-->
             </tr>
         </thead>
-        <tbody>
+        <tbody id="tableBody">
         </tbody>
         <!--Add footer for totals-->
     </table>
