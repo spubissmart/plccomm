@@ -31,7 +31,7 @@
         }
         // the get request fails and I don't know what value is returned by the server, but it should work if it's an array of integers
         $.get('/api/plcread', {address: 'ZR0', len: 10, station: 1})
-            .done(function (data) {
+            .done((data) => {
                 var intsArray = JSON.parse(data)
                 updateTable(intsArray);
             })
